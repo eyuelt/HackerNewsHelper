@@ -1,3 +1,5 @@
+//handles opening new tab
+//listens for messages from content script
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
 		console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
@@ -16,4 +18,10 @@ chrome.runtime.onMessage.addListener(
 			result = "opened new tab";
 		}
 		sendResponse({result: result});
+	});
+
+
+//logic for handling clicks on browser action icon
+chrome.browserAction.onClicked.addListener(function() {
+		alert("icon clicked");
 	});
