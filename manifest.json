@@ -5,8 +5,6 @@
   "description": "This extension allows for automatically opening links in a new tab on Hacker News.",
   "version": "1.0",
 
-  "permissions": ["tabs"],
-
   "background": {
       "scripts": ["background.js"],
 	  "persistent": false
