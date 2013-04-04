@@ -22,6 +22,9 @@ chrome.runtime.onMessage.addListener(
 
 
 //logic for handling clicks on browser action icon
-chrome.browserAction.onClicked.addListener(function() {
-		alert("icon clicked");
+chrome.browserAction.onClicked.addListener(function(tab) {
+		var targetURL = "https://news.ycombinator.com";
+		if (tab.url !== targetURL) {
+			chrome.tabs.update(tab.id, { url: targetURL }, function(){});
+		}
 	});
