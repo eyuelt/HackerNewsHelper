@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+
+  "name": "HackerNewsHelper",
+  "description": "This extension allows for automatically opening links in a new tab on Hacker News.",
+  "version": "1.0",
+
+  "permissions": ["tabs"],
+
+  "background": {
+      "scripts": ["background.js"],
+	  "persistent": false
+  },
+  "browser_action": {
+      "default_title": "HackerNewsHelper",
+	  "default_icon": "yc_icon.gif"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://news.ycombinator.com/*"],
+      "js": ["content_script.js"]
+    }
+  ],
+  "web_accessible_resources": ["inject.js"]
+}
