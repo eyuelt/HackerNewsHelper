@@ -24,10 +24,50 @@ chrome.runtime.onMessage.addListener(
 	});
 
 
+//keeps track of the toggle state of the clicks while on HN
+state = 0;
+
 //logic for handling clicks on browser action icon
 chrome.browserAction.onClicked.addListener(function(tab) {
-		var targetURL = "https://news.ycombinator.com";
-		if (tab.url !== targetURL) {
-			chrome.tabs.update(tab.id, {url: targetURL});
+		var targetURL = "https://news.ycombinator.com/";
+		if (tab.url !== targetURL) { //we are not on the HN homepage
+			//go to the HN homepage
+			chrome.tabs.update(tab.id, { url: targetURL }, function(){});
+			state = 0;
+		} else { //we are already on the HN homepage
+			//toggle between options 1, 2, 3
+			var badgeColor = [255, 0, 0];
+			chrome.browserAction.setBadgeBackgroundColor({color: colorWithAlpha(badgeColor, 255)});
+			chrome.browserAction.setBadgeText({text: (state+1).toString()});
+			setTimeout(fadeOutBadge, 500);
+			state = (state + 1) % 3;
 		}
 	});
+
+//color is an RGB color array, alpha is the A value in the returned RGBA color array
+function colorWithAlpha(color, alpha) {
+	return color.concat(alpha);
+}
+
+//fades badge out by reducing opacity over time and then removing the badge altogether
+function fadeOutBadge() {
+	chrome.browserAction.getBadgeBackgroundColor({}, function(result) {
+			var color = result.slice(0,3);
+			var alpha = result[3];
+			
+			var reduceDelta = 50;
+			var timeInterval = 50;
+			var x = setInterval(function() {
+					if (alpha - reduceDelta <= 0) {
+						clearInterval(x);
+						chrome.browserAction.setBadgeText({text: ""});
+						chrome.browserAction.setBadgeBackgroundColor({color: colorWithAlpha(color, 255)});
+					} else {
+						chrome.browserAction.getBadgeBackgroundColor({}, function(result) {
+								alpha -= reduceDelta;
+								chrome.browserAction.setBadgeBackgroundColor({color: colorWithAlpha(color, alpha)});
+							});
+					}
+				}, timeInterval);
+		});
+}
