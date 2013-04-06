@@ -21,18 +21,27 @@ chrome.runtime.onMessage.addListener(
 		var result = "did not open webpage";
 		var success = false;
 		if (request.say == "open webpage" && request.url !== undefined) {
-			var focusOnNewTab = false;
-			try {
-				chrome.tabs.create({
-						    url: request.url,
-							selected: focusOnNewTab,
-							openerTabId: sender.tab.id,
-							windowId: sender.tab.windowId,
-							index: sender.tab.index + 1
-							});
-			} catch(e) { alert(e); }				
-			result = "opened webpage in new tab with focusOnNewTab = " + focusOnNewTab;
-			success = true;
+			if (getState() == 3) {
+				try {
+					chrome.tabs.update(sender.tab.id, {url: request.url});
+				} catch(e) { alert(e); }
+				result = "opened webpage in same tab";
+				success = true;
+			} else {
+				var focusOnNewTab = false;
+				if (getState() == 2) focusOnNewTab = true;
+				try {
+					chrome.tabs.create({
+						        url: request.url,
+								selected: focusOnNewTab,
+								openerTabId: sender.tab.id,
+								windowId: sender.tab.windowId,
+								index: sender.tab.index + 1
+								});
+				} catch(e) { alert(e); }
+				result = "opened webpage in new tab with focusOnNewTab = " + focusOnNewTab;
+				success = true;
+			}
 		}
 		sendResponse({result: result, success: success});
 	});
@@ -43,14 +52,11 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 		var targetURL = "https://news.ycombinator.com/";
 		if (tab.url !== targetURL) { //we are not on the HN homepage
 			//go to the HN homepage
-			chrome.tabs.update(tab.id, { url: targetURL }, function(){});
+			chrome.tabs.update(tab.id, {url: targetURL});
 		} else { //we are already on the HN homepage
 			//toggle between options 1, 2, 3
 			var badgeColor = [255, 0, 0];
 			setState((getState() % 3) + 1);
-			/*chrome.browserAction.setBadgeBackgroundColor({color: colorWithAlpha(badgeColor, 255)});
-			chrome.browserAction.setBadgeText({text: getState().toString()});
-			setTimeout(fadeOutBadge, 500);*/
 			updateIcon(tab.id);
 		}
 	});
