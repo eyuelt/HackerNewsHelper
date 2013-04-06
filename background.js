@@ -48,9 +48,10 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 			//toggle between options 1, 2, 3
 			var badgeColor = [255, 0, 0];
 			setState((getState() % 3) + 1);
-			chrome.browserAction.setBadgeBackgroundColor({color: colorWithAlpha(badgeColor, 255)});
+			/*chrome.browserAction.setBadgeBackgroundColor({color: colorWithAlpha(badgeColor, 255)});
 			chrome.browserAction.setBadgeText({text: getState().toString()});
-			setTimeout(fadeOutBadge, 500);
+			setTimeout(fadeOutBadge, 500);*/
+			updateIcon(tab.id);
 		}
 	});
 
@@ -80,4 +81,29 @@ function fadeOutBadge() {
 					}
 				}, timeInterval);
 		});
+}
+
+//set the icon image to the icon represented by the current state
+function updateIcon(tabId) {
+	//alert("need to update icon for tab " + tabId);
+	var image_19;
+	var image_38;
+	switch(getState()) {
+	case 2:
+		image_19 = "images/yc_icon_19-2.png";
+		image_38 = "images/yc_icon_38-2.png";
+		break;
+	case 3:
+		image_19 = "images/yc_icon_19-3.png";
+		image_38 = "images/yc_icon_38-3.png";
+		break;
+	default:
+		image_19 = "images/yc_icon_19.png";
+		image_38 = "images/yc_icon_38.png";
+		break;
+	}
+	
+	try {
+		chrome.browserAction.setIcon({path: {'19': image_19, '38': image_38}, tabId: tabId});
+	} catch(e) { alert(e); }
 }
