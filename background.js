@@ -1,3 +1,17 @@
+//keeps track of the toggle state of the clicks while on HN
+state = 0;
+
+//getter for toggle state
+function getState() {
+	return state+1;
+}
+
+//setter for toggle state
+function setState(stateToSet) {
+	state = stateToSet - 1;
+}
+
+
 //handles opening new tab
 //listens for messages from content script
 chrome.runtime.onMessage.addListener(
@@ -24,23 +38,19 @@ chrome.runtime.onMessage.addListener(
 	});
 
 
-//keeps track of the toggle state of the clicks while on HN
-state = 0;
-
 //logic for handling clicks on browser action icon
 chrome.browserAction.onClicked.addListener(function(tab) {
 		var targetURL = "https://news.ycombinator.com/";
 		if (tab.url !== targetURL) { //we are not on the HN homepage
 			//go to the HN homepage
 			chrome.tabs.update(tab.id, { url: targetURL }, function(){});
-			state = 0;
 		} else { //we are already on the HN homepage
 			//toggle between options 1, 2, 3
 			var badgeColor = [255, 0, 0];
+			setState((getState() % 3) + 1);
 			chrome.browserAction.setBadgeBackgroundColor({color: colorWithAlpha(badgeColor, 255)});
-			chrome.browserAction.setBadgeText({text: (state+1).toString()});
+			chrome.browserAction.setBadgeText({text: getState().toString()});
 			setTimeout(fadeOutBadge, 500);
-			state = (state + 1) % 3;
 		}
 	});
 
