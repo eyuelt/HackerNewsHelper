@@ -4,20 +4,23 @@ chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
 		console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
 				
-		var result = "did nothing";
-		if (request.say == "open new tab" && request.url !== undefined) {
+		var result = "did not open webpage";
+		var success = false;
+		if (request.say == "open webpage" && request.url !== undefined) {
 			var focusOnNewTab = false;
-			if (request.focusOnNewTab == true) focusOnNewTab = true;
-			chrome.tabs.create({
-						url: request.url,
-						selected: focusOnNewTab,
-						openerTabId: sender.tab.id,
-						windowId: sender.tab.windowId,
-						index: sender.tab.index + 1
-						});
-			result = "opened new tab";
+			try {
+				chrome.tabs.create({
+						    url: request.url,
+							selected: focusOnNewTab,
+							openerTabId: sender.tab.id,
+							windowId: sender.tab.windowId,
+							index: sender.tab.index + 1
+							});
+			} catch(e) { alert(e); }				
+			result = "opened webpage in new tab with focusOnNewTab = " + focusOnNewTab;
+			success = true;
 		}
-		sendResponse({result: result});
+		sendResponse({result: result, success: success});
 	});
 
 
@@ -25,6 +28,6 @@ chrome.runtime.onMessage.addListener(
 chrome.browserAction.onClicked.addListener(function(tab) {
 		var targetURL = "https://news.ycombinator.com";
 		if (tab.url !== targetURL) {
-			chrome.tabs.update(tab.id, { url: targetURL }, function(){});
+			chrome.tabs.update(tab.id, {url: targetURL});
 		}
 	});
