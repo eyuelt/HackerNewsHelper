@@ -1,6 +1,8 @@
 main();
 
 function main() {
+	newHNTabOpened();
+
 	//add openPage code to webpage
 	var headElem = document.getElementsByTagName('head')[0];
 	var scriptElem = document.createElement('script');
@@ -52,6 +54,16 @@ function changeLink(aElem, id) {
 function openWebPage(url) {
 	try {
 		chrome.runtime.sendMessage({say: "open webpage", url: url}, function(response) {
+				console.log("'Hacker News Helper' extension says: " + response.result);
+			});
+	} catch(e) {
+		alert(e);
+	}
+}
+
+function newHNTabOpened() {
+	try {
+		chrome.runtime.sendMessage({say: "new HN tab opened"}, function(response) {
 				console.log("'Hacker News Helper' extension says: " + response.result);
 			});
 	} catch(e) {

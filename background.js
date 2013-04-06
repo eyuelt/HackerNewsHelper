@@ -20,13 +20,15 @@ function setState(stateToSet, callback) {
 }
 
 
+updateAllHNTabIcons();
+
 //handles opening new tab
 //listens for messages from content script
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
 		console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
 				
-		var result = "did not open webpage";
+		var result = "did nothing";
 		var success = false;
 		if (request.say == "open webpage" && request.url !== undefined) {
 			getState(function(state) {
@@ -52,6 +54,10 @@ chrome.runtime.onMessage.addListener(
 						success = true;
 					}
 				});
+		} else if (request.say == "new HN tab opened") {
+			updateIcon(sender.tab.id);
+			result = "updated toggle state for new tab";
+			success = true;
 		}
 		sendResponse({result: result, success: success});
 	});
@@ -128,4 +134,17 @@ function updateIcon(tabId) {
 				chrome.browserAction.setIcon({path: {'19': image_19, '38': image_38}, tabId: tabId});
 			} catch(e) { alert(e); }
 		});
+}
+
+
+//update icon for all already open Hacker News tabs (should be called at extension launch)
+function updateAllHNTabIcons() {
+	try {
+		chrome.tabs.query({url: "https://news.ycombinator.com/"}, function(HNTabs) {
+				for(var i = 0; i < HNTabs.length; i++) {
+					updateIcon(HNTabs[i].id);
+				}
+			});
+		alert("starting extension");
+	} catch(e) { alert(e); }
 }
