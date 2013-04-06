@@ -20,7 +20,7 @@
 	      "19": "images/yc_icon_19.png",
 		  "38": "images/yc_icon_38.png"
 	  },
-	  "default_title": "Hacker News Helper"
+	  "default_title": "[[Hacker News Helper]]\nModifies how HN links open.\nClick to toggle options.\n Options:\n  1. New tab without focus\n  2. New tab with focus\n  3. Same tab"
   },
   "content_scripts": [
     {
