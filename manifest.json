@@ -5,6 +5,8 @@
   "description": "Allows for automatically opening links in a new tab on Hacker News.",
   "version": "1.0",
 
+  "permissions": ["storage"],
+
   "icons": {
   	  "16": "images/yc_icon_16.png",
 	  "48": "images/yc_icon_48.png",
