@@ -1,15 +1,22 @@
-//keeps track of the toggle state of the clicks while on HN
-state = 0;
+//key for the toggle state in the chrome local storage
+TOGGLE_STATE_KEY = "toggle_state";
 
 //getter for toggle state
 function getState(callback) {
-	callback(state+1);
+	var obj = {};
+	obj[TOGGLE_STATE_KEY] = 0;
+	chrome.storage.local.get(obj, function(items) {
+			callback(items[TOGGLE_STATE_KEY] + 1);
+		});
 }
 
 //setter for toggle state
 function setState(stateToSet, callback) {
-	state = stateToSet - 1;
-	callback();
+	var obj = {};
+	obj[TOGGLE_STATE_KEY] = stateToSet - 1;
+	chrome.storage.local.set(obj, function() {
+			callback();
+		});
 }
 
 
@@ -100,6 +107,7 @@ function updateIcon(tabId) {
 	//alert("need to update icon for tab " + tabId);
 	var image_19;
 	var image_38;
+
 	getState(function(state) {
 			switch(state) {
 			case 2:
