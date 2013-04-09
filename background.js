@@ -2,13 +2,14 @@
 state = 0;
 
 //getter for toggle state
-function getState() {
-	return state+1;
+function getState(callback) {
+	callback(state+1);
 }
 
 //setter for toggle state
-function setState(stateToSet) {
+function setState(stateToSet, callback) {
 	state = stateToSet - 1;
+	callback();
 }
 
 
@@ -21,27 +22,29 @@ chrome.runtime.onMessage.addListener(
 		var result = "did not open webpage";
 		var success = false;
 		if (request.say == "open webpage" && request.url !== undefined) {
-			if (getState() == 3) {
-				try {
-					chrome.tabs.update(sender.tab.id, {url: request.url});
-				} catch(e) { alert(e); }
-				result = "opened webpage in same tab";
-				success = true;
-			} else {
-				var focusOnNewTab = false;
-				if (getState() == 2) focusOnNewTab = true;
-				try {
-					chrome.tabs.create({
-						        url: request.url,
-								selected: focusOnNewTab,
-								openerTabId: sender.tab.id,
-								windowId: sender.tab.windowId,
-								index: sender.tab.index + 1
-								});
-				} catch(e) { alert(e); }
-				result = "opened webpage in new tab with focusOnNewTab = " + focusOnNewTab;
-				success = true;
-			}
+			getState(function(state) {
+					if (state == 3) {
+						try {
+							chrome.tabs.update(sender.tab.id, {url: request.url});
+						} catch(e) { alert(e); }
+						result = "opened webpage in same tab";
+						success = true;
+					} else {
+						var focusOnNewTab = false;
+						if (state == 2) focusOnNewTab = true;
+						try {
+							chrome.tabs.create({
+									    url: request.url,
+										selected: focusOnNewTab,
+										openerTabId: sender.tab.id,
+										windowId: sender.tab.windowId,
+										index: sender.tab.index + 1
+										});
+						} catch(e) { alert(e); }
+						result = "opened webpage in new tab with focusOnNewTab = " + focusOnNewTab;
+						success = true;
+					}
+				});
 		}
 		sendResponse({result: result, success: success});
 	});
@@ -56,8 +59,11 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 		} else { //we are already on the HN homepage
 			//toggle between options 1, 2, 3
 			var badgeColor = [255, 0, 0];
-			setState((getState() % 3) + 1);
-			updateIcon(tab.id);
+			getState(function(state) {
+					setState((state % 3) + 1, function() {
+							updateIcon(tab.id);
+						});
+				});
 		}
 	});
 
@@ -94,22 +100,24 @@ function updateIcon(tabId) {
 	//alert("need to update icon for tab " + tabId);
 	var image_19;
 	var image_38;
-	switch(getState()) {
-	case 2:
-		image_19 = "images/yc_icon_19-2.png";
-		image_38 = "images/yc_icon_38-2.png";
-		break;
-	case 3:
-		image_19 = "images/yc_icon_19-3.png";
-		image_38 = "images/yc_icon_38-3.png";
-		break;
-	default:
-		image_19 = "images/yc_icon_19.png";
-		image_38 = "images/yc_icon_38.png";
-		break;
-	}
-	
-	try {
-		chrome.browserAction.setIcon({path: {'19': image_19, '38': image_38}, tabId: tabId});
-	} catch(e) { alert(e); }
+	getState(function(state) {
+			switch(state) {
+			case 2:
+				image_19 = "images/yc_icon_19-2.png";
+				image_38 = "images/yc_icon_38-2.png";
+				break;
+			case 3:
+				image_19 = "images/yc_icon_19-3.png";
+				image_38 = "images/yc_icon_38-3.png";
+				break;
+			default:
+				image_19 = "images/yc_icon_19.png";
+				image_38 = "images/yc_icon_38.png";
+				break;
+			}
+
+			try {
+				chrome.browserAction.setIcon({path: {'19': image_19, '38': image_38}, tabId: tabId});
+			} catch(e) { alert(e); }
+		});
 }
