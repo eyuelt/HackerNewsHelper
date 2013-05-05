@@ -73,7 +73,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 			//toggle between options 1, 2, 3
 			getState(function(state) {
 					setState((state % 3) + 1, function() {
-							updateIcon(tab.id);
+							updateAllHNTabIcons(tab.id);
 						});
 				});
 		}
