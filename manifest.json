@@ -26,7 +26,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://news.ycombinator.com/*"],
+      "matches": ["https://news.ycombinator.com/"],
       "js": ["content_script.js"]
     }
   ],
