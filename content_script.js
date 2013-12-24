@@ -13,9 +13,7 @@ function main() {
 	//add click event listener
 	document.addEventListener("linkClicked", function(e) {
 			var aElem = e.target;
-			var href = aElem.href;
-			aElem.setAttribute('href', 'javascript:void(0)');
-			openWebPage(href);
+			openWebPage(aElem.href);
 		}, true);
 	
 	
@@ -47,8 +45,7 @@ function main() {
 
 function changeLink(aElem, id) {
 	aElem.setAttribute('id', 'HNHelper' + id);
-	aElem.setAttribute('onclick', "onLinkClicked(\'" + aElem.id + "\', \'" + aElem.href + "\')");
-	aElem.setAttribute('href', 'javascript:void(0)');
+	aElem.setAttribute('onclick', "event.preventDefault(); onLinkClicked(\'" + aElem.id + "\', \'" + aElem.href + "\')");
 }
 
 function openWebPage(url) {

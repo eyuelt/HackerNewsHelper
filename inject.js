@@ -8,7 +8,6 @@ function onLinkClicked(aElemID, href) {
 		var aElem = document.getElementById(aElemID);
 		var e = document.createEvent("Events");
 		e.initEvent("linkClicked", false, true);
-		aElem.setAttribute('href', href);
 		aElem.dispatchEvent(e);
 	}
 }
